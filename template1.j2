@@ -1,0 +1,5 @@
+{% set mac_table_normalized = [] %}
+{% for mac in show_mac_address_table %}
+{% set _ = mac_table_normalized.append(mac["destination_address"]) %}
+{% endfor %}
+{{ mac_table_normalized }}

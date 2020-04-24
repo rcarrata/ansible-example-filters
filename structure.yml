@@ -1,0 +1,93 @@
+---
+- name: "SHOW THE VARIOUS WAYS TO RESTRUCTURE DATA"
+  hosts: "localhost"
+  connection: "local"
+  gather_facts: "no"
+  vars:
+    show_mac_address_table:
+      - destination_address: "aabb.cc00.6000"
+        destination_port: "Fa1/0/36"
+        type: "DYNAMIC"
+        vlan: "153"
+      - destination_address: "ca03.3efb.0000"
+        destination_port: "Fa1/0/36"
+        type: "DYNAMIC"
+        vlan: "100"
+      - destination_address: "f44d.3063.34f3"
+        destination_port: "Fa1/0/35"
+        type: "DYNAMIC"
+        vlan: "22"
+      - destination_address: "2c6b.f553.9d80"
+        destination_port: "Fa1/0/48"
+        type: "DYNAMIC"
+        vlan: "254"
+
+  tasks:
+    - name: "100 - SET FACT TO NORMALIZE DATA"
+      set_fact:
+        mac_table_normalized: "{{ mac_table_normalized | default([]) }} + [ '{{ item.destination_address }}' ]"
+      loop: "{{ show_mac_address_table }}"
+
+    - debug: var=mac_table_normalized
+
+    - name: "101 - SET FACT TO NORMALIZE DATA IN JINJA"
+      set_fact:
+        mac_table_normalized:  "{{ lookup('template', 'template1.j2') }}"
+
+    - debug: var=mac_table_normalized
+
+    - name: "102 - SET FACT TO NORMALIZE DATA IN JINJA"
+      set_fact:
+        mac_table_normalized:  "{{ lookup('template', 'template2.j2') }}"
+
+    - debug: var=mac_table_normalized
+
+    - name: "103 - SET FACT TO NORMALIZE DATA IN JINJA"
+      set_fact:
+        mac_table_normalized:  []
+
+    - name: "104 - SET FACT TO NORMALIZE DATA"
+      set_fact:
+        mac_table_normalized: "{{ mac_table_normalized | default([]) + [ { 'device': inventory_hostname, 'mac': item.destination_address, 'vlan': item.vlan, 'interface': item.destination_port } ] }}"
+      loop: "{{ show_mac_address_table }}"
+
+    - debug: var=mac_table_normalized
+
+    - name: "105 - SET FACT TO NORMALIZE DATA IN JINJA"
+      set_fact:
+        mac_table_normalized:  "{{ lookup('template', 'template3.j2') }}"
+
+    - debug: var=mac_table_normalized
+
+    - name: "106 - SET FACT TO NORMALIZE DATA IN JINJA"
+      set_fact:
+        mac_table_normalized:  {}
+
+    - name: "107 - SET FACT TO NORMALIZE DATA"
+      set_fact:
+        mac_table_normalized: "{{ mac_table_normalized | default({}) | combine( {item.destination_address: { 'device': inventory_hostname, 'vlan': item.vlan, 'interface': item.destination_port }} )}}"
+      loop: "{{ show_mac_address_table }}"
+
+    - debug: var=mac_table_normalized
+
+    - name: "108 - SET FACT TO NORMALIZE DATA IN JINJA"
+      set_fact:
+        mac_table_normalized:  {}
+
+    - name: "109 - SET FACT TO NORMALIZE DATA"
+      set_fact:
+        mac_table_normalized: "{{ show_mac_address_table | rekey_on_member('destination_address') }}"
+      loop: "{{ show_mac_address_table }}"
+
+    - debug: var=mac_table_normalized
+
+    - name: "110 - SET FACT TO NORMALIZE DATA IN JINJA"
+      set_fact:
+        mac_table_normalized:  {}
+
+    - name: "111 - SET FACT TO NORMALIZE DATA"
+      set_fact:
+        mac_table_normalized:  "{{ lookup('template', 'template4.j2') }}"
+      loop: "{{ show_mac_address_table }}"
+
+    - debug: var=mac_table_normalized
